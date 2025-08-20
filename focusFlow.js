@@ -2,10 +2,12 @@
 let workTime = 0;
 let breakTime = 0;
 
+/*
+let totalTime = 0;
+later add feature that shows the total time you have done the pomodoro timer once you have clicked start it will keep going till you click stop button.
+*/
 let timerDisplay = document.getElementById("timer-time");
 let sessionDescription = document.getElementsByClassName("session-description");
-
-
 
 // DOM elements
 const preset25 = document.getElementById("preset25/5");
@@ -31,7 +33,7 @@ function selectPreset(work, brk, timeOptionButton) {
     });
 }
 
-preset25.addEventListener("click", () => selectPreset(1, 5, preset25));
+preset25.addEventListener("click", () => selectPreset(.5, .5, preset25));
 preset30.addEventListener("click", () => selectPreset(30, 10, preset30));
 preset40.addEventListener("click", () => selectPreset(45, 15, preset40));
 
@@ -58,9 +60,24 @@ startBtn.addEventListener("click", () => {
     }
 
     if (!isRunning) {
+        console.log("start button clicked");
         startTimer();
     }
 });
+
+pauseBtn.addEventListener("click", () => {
+    if (workTime === 0) {
+        alert("You haven't started working. You cannot pause.");
+        return;
+    }
+    console.log("pause button clicked");
+    /* how to pause the time?
+    -> once the user has started a session and clicks on pause button -> the timer stops until start button is clicked again
+    mess with updateDisplay()
+
+    */
+});
+
 
 function startTimer() {
     if (currentTime === 0) {
@@ -104,9 +121,17 @@ function updateDisplay() {
     timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+// handles timer completion
 function handleTimerComplete() {
     clearInterval(timerInterval);
-
-    isWorkSession = false;
-    updateSessionDescription(isWorkSession);
+    if (isWorkSession) {
+        isWorkSession = false;
+        currentTime = breakTime * 60;
+        updateSessionDescription(isWorkSession);
+        startTimer();
+    }
+    else {
+        currentTime = 0;
+        startTimer();
+    }
 }
