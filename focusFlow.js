@@ -6,13 +6,13 @@ let breakTime = 0;
 let totalTime = 0;
 later add feature that shows the total time you have done the pomodoro timer once you have clicked start it will keep going till you click stop button.
 */
-let timerDisplay = document.getElementById("timer-time");
+let timerTime = document.getElementById("timer-time");
 let sessionDescription = document.getElementsByClassName("session-description");
 
 // DOM elements
 const preset25 = document.getElementById("preset25/5");
 const preset30 = document.getElementById("preset30/10");
-const preset40 = document.getElementById("preset40/15");
+const preset40 = document.getElementById("preset45/15");
 
 function selectPreset(work, brk, timeOptionButton) {
     workTime = work;
@@ -66,11 +66,15 @@ startBtn.addEventListener("click", () => {
 });
 
 pauseBtn.addEventListener("click", () => {
-    if (workTime === 0) {
+    if (workTime === 0 || !isRunning) {
         alert("You haven't started working. You cannot pause.");
         return;
     }
-    console.log("pause button clicked");
+
+    clearInterval(timerInterval);
+    isRunning = false;
+    startBtn.disabled = false; // allow resume
+    console.log("Timer paused");
     /* how to pause the time?
     -> once the user has started a session and clicks on pause button -> the timer stops until start button is clicked again
     mess with updateDisplay()
@@ -78,6 +82,25 @@ pauseBtn.addEventListener("click", () => {
     */
 });
 
+stopBtn.addEventListener("click", () => {
+    if (workTime === 0 || !isRunning) {
+        alert("You haven't started working. You cannot stop.");
+        return;
+    }
+
+    clearInterval(timerInterval);
+    isRunning = false;
+    currentTime = 0;
+    updateDisplay();
+    isWorkSession = false;
+    updateSessionDescription(isWorkSession);
+
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+
+    console.log("Timer stopped");
+});
 
 function startTimer() {
     if (currentTime === 0) {
@@ -92,6 +115,7 @@ function startTimer() {
     pauseBtn.disabled = false;
     stopBtn.disabled = false;
 
+    // timer runs
     timerInterval = setInterval(() => {
         currentTime--;
         updateDisplay();
@@ -118,7 +142,7 @@ function updateSessionDescription(isWorkSession) {
 function updateDisplay() {
     const minutes = Math.floor(currentTime / 60);
     const seconds = currentTime % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    timerTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 // handles timer completion
