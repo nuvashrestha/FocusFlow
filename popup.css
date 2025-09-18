@@ -1,0 +1,100 @@
+:root {
+    --primary-blue: #4A90E2;
+    --secondary-blue: #e6ecfe;
+    --light-blue: #C8DFF9;
+    --secondary-green: #4ebf7d;
+    --accent-gray: #F5F7FA;
+    --dark-text: #2C3E50;
+    --light-text: #7F8C8D;
+    --background-white: #FFFFFF;
+}
+
+body {
+    font-family: "Roboto Mono", monospace;
+    margin: 0;
+    padding: 20px;
+    color: var(--dark-text);
+}
+
+.display-3 {
+    text-align: center;
+    color: var(--primary-blue);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.timer-display {
+    text-align: center;
+    color: var(--primary-blue);
+    background-color: var(--light-blue);
+    border: 2px solid var(--primary-blue);
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 2rem;
+    margin: 0 auto 15px auto;
+    max-width: 400px;
+}
+
+.timer-display h2 {
+    font-size: 6rem;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1;
+    text-align: center;
+}
+
+.session-description {
+    text-align: center;
+    color: var(--dark-text);
+    background-color: var(--secondary-blue);
+    border: 2px solid var(--primary-blue);
+    border-radius: 15px;
+    padding: 10px;
+    margin: 0 auto 20px auto;
+    max-width: 500px;
+}
+
+.timer-options button, .control-buttons button {
+    margin: 0 5px 5px 0;
+}
+
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--secondary-green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--light-text);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--accent-gray);
+}
+
+.footer p {
+    margin: 2px 0;
+}
