@@ -1,172 +1,142 @@
-let workTime = 0;
-let breakTime = 0;
+// // popup.js
+// const timerTime = document.getElementById("timer-time");
+// const sessionDescription = document.getElementsByClassName("session-description")[0];
 
-let timerTime = document.getElementById("timer-time");
-let sessionDescription = document.getElementsByClassName("session-description");
+// const preset25 = document.getElementById("preset25_5");
+// const preset30 = document.getElementById("preset30_10");
+// const preset40 = document.getElementById("preset45_15");
 
-const alarm = new Audio("alarm.wav");
+// const startBtn = document.getElementById("startBtn");
+// const pauseBtn = document.getElementById("pauseBtn");
+// const stopBtn = document.getElementById("stopBtn");
+
+// let selectedWork = 0;
+// let selectedBreak = 0;
+
+// // Preset selection
+// preset25.addEventListener("click", () => selectPreset(25, 5));
+// preset30.addEventListener("click", () => selectPreset(30, 10));
+// preset40.addEventListener("click", () => selectPreset(45, 15));
+
+// function selectPreset(work, brk) {
+//     selectedWork = work;
+//     selectedBreak = brk;
+// }
+
+// // Button handlers
+// startBtn.addEventListener("click", () => {
+//     chrome.runtime.sendMessage({ action: "start", workTime: selectedWork, breakTime: selectedBreak });
+// });
+
+// pauseBtn.addEventListener("click", () => {
+//     chrome.runtime.sendMessage({ action: "pause" });
+// });
+
+// stopBtn.addEventListener("click", () => {
+//     chrome.runtime.sendMessage({ action: "stop" });
+// });
+
+// setInterval(() => {
+//     chrome.runtime.sendMessage({ action: "getState" }, (state) => {
+//         const minutes = Math.floor(state.currentTime / 60);
+//         const seconds = state.currentTime % 60;
+//         timerTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+//         sessionDescription.textContent = state.isWorkSession ? "Deep focus time - minimize distractions" : "Break time - relax and recharge";
+//     });
+// }, 1000);
+
+
+
+const timerTime = document.getElementById("timer-time");
+const sessionDescription = document.getElementsByClassName("session-description")[0];
 
 const preset25 = document.getElementById("preset25_5");
 const preset30 = document.getElementById("preset30_10");
 const preset40 = document.getElementById("preset45_15");
 
-preset25.addEventListener("click", () => selectPreset(25, 5, preset25));
-preset30.addEventListener("click", () => selectPreset(30, 10, preset30));
-preset40.addEventListener("click", () => selectPreset(45, 15, preset40));
-
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const stopBtn = document.getElementById("stopBtn");
 
-let currentTime = 0;
-let isRunning = false;
-let isWorkSession = true;
-let timerInterval = null;
+let selectedWork = 0;
+let selectedBreak = 0;
 
-function playAlarm() {
-    alarm.play();
+const workQuotes = [
+    "Deep focus: Let’s crush those tasks!",
+    "Stay on target and stay unstoppable!",
+    "Your focus defines your success!",
+    "Work hard, stay present, achieve more!",
+];
+const breakQuotes = [
+    "Take a deep breath and recharge!",
+    "Relax, reset, and come back stronger!",
+    "Break time: Your brain deserves it!",
+    "Refresh your mind, fuel your focus!",
+];
 
-    setTimeout(() => {
-        alarm.pause();
-        alarm.currentTime = 0; 
-    }, 3000);
-}
+preset25.addEventListener("click", () => selectPreset(25, 5));
+preset30.addEventListener("click", () => selectPreset(30, 10));
+preset40.addEventListener("click", () => selectPreset(45, 15));
 
-function showToast(message) {
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) {
-        existingToast.remove();
-    }
+function selectPreset(work, brk) {
+    selectedWork = work;
+    selectedBreak = brk;
 
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.textContent = message;
+    startBtn.disabled = false;
+    pauseBtn.disabled = false;
+    stopBtn.disabled = false;
 
-    document.body.appendChild(toast);
+    timerTime.textContent = `${work.toString().padStart(2, '0')}:00`;
 
-    setTimeout(() => toast.classList.add('show'), 10);
-
-    setTimeout(() => {
-        toast.classList.add('hide');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function selectPreset(work, brk, timeOptionButton) {
-    workTime = work;
-    breakTime = brk;
-
-    showToast(`Selected: ${work} min work, ${brk} min break`);
-
-    const presetButtons = document.querySelectorAll(".timer-options button");
-
-    presetButtons.forEach(timeOptionButton => {
-        timeOptionButton.addEventListener("click", () => {
-            presetButtons.forEach(btn => btn.classList.remove("selected"));
-            timeOptionButton.classList.add("selected");
-        });
+    chrome.runtime.sendMessage({
+        action: "setPreset",
+        workTime: selectedWork,
+        breakTime: selectedBreak,
+        currentTime: selectedWork * 60
     });
 }
 
 startBtn.addEventListener("click", () => {
-    if (workTime === 0) {
-        alert("Please select a time preset first!");
+    if (!selectedWork || !selectedBreak) {
+        alert("Please select a preset first!");
         return;
     }
 
-    if (!isRunning) {
-        console.log("start button clicked");
-        startTimer();
-    }
+    // Send message to background
+    chrome.runtime.sendMessage({ action: "start", workTime: selectedWork, breakTime: selectedBreak }, (response) => {
+        if (response.status === "started") {
+            const quote = workQuotes[Math.floor(Math.random() * workQuotes.length)];
+            sessionDescription.textContent = quote;
+        }
+    });
 });
 
 pauseBtn.addEventListener("click", () => {
-    if (workTime === 0 || !isRunning) {
-        alert("You haven't started working. You cannot pause.");
-        return;
-    }
-
-    clearInterval(timerInterval);
-    isRunning = false;
-    startBtn.disabled = false; 
-    console.log("Timer paused");
+    chrome.runtime.sendMessage({ action: "pause" }, (response) => {
+        if (response.status === "paused") {
+            sessionDescription.textContent = "Timer paused. Ready when you are!";
+        }
+    });
 });
 
 stopBtn.addEventListener("click", () => {
-    if (workTime === 0 || !isRunning) {
-        alert("You haven't started working. You cannot stop.");
-        return;
-    }
-
-    clearInterval(timerInterval);
-    isRunning = false;
-    currentTime = 0;
-    updateDisplay();
-    isWorkSession = false;
-    updateSessionDescription(isWorkSession);
-
-    startBtn.disabled = false;
+    chrome.runtime.sendMessage({ action: "stop" }, (response) => {
+        if (response.status === "stopped") {
+            sessionDescription.textContent = "Timer stopped. Select a preset to start again!";
+        }
+    });
+    startBtn.disabled = true;
     pauseBtn.disabled = true;
     stopBtn.disabled = true;
-
-    console.log("Timer stopped");
+    selectedWork = 0;
+    selectedBreak = 0;
 });
 
-function startTimer() {
-    if (currentTime === 0) {
-        currentTime = workTime * 60;
-        isWorkSession = true;
-        updateSessionDescription(isWorkSession);
-    }
-
-    isRunning = true;
-
-    startBtn.disabled = true;
-    pauseBtn.disabled = false;
-    stopBtn.disabled = false;
-
-    timerInterval = setInterval(() => {
-        currentTime--;
-        updateDisplay();
-
-        if (currentTime <= 0) {
-            console.log("session ended");
-            handleTimerComplete();
-        }
-
-    }, 1000);
-    playAlarm();
-}
-
-function updateSessionDescription(isWorkSession) {
-    let description = document.getElementsByClassName("session-description");
-
-    if (isWorkSession) {
-        description[0].textContent = "Deep focus time - minimize distractions and stay concentrated";
-    }
-    else if (!isWorkSession) {
-        description[0].textContent = "Break time - relax and recharge";
-    }
-}
-
-function updateDisplay() {
-    const minutes = Math.floor(currentTime / 60);
-    const seconds = currentTime % 60;
-    timerTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
-function handleTimerComplete() {
-    clearInterval(timerInterval);
-
-    if (isWorkSession) {
-        isWorkSession = false;
-        currentTime = breakTime * 60;
-        updateSessionDescription(isWorkSession);
-        playAlarm();
-        startTimer();
-    }
-    else {
-        currentTime = 0;
-        startTimer();
-    }
-}
+setInterval(() => {
+    chrome.runtime.sendMessage({ action: "getState" }, (state) => {
+        const minutes = Math.floor(state.currentTime / 60);
+        const seconds = state.currentTime % 60;
+        timerTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    });
+}, 1000);

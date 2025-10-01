@@ -15,7 +15,6 @@ When to Use It: Use FocusFlow whenever you feel a need to boost your productivit
 - Mindful Breaks
 - State Persistence
 - Lightweight & Secure
-- Audio Cues
 
 ---
 

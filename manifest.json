@@ -14,8 +14,9 @@
         }
     ],
     "action": {
-        "default_popup": "popup.html",
-        "default_title": "FocusFlow"
+        "default_popup": "index.html",
+        "default_title": "FocusFlow",
+        "default_icon": "focusflow-logo.png"
     },
     "background": {
         "service_worker": "background.js"
@@ -31,5 +32,15 @@
     ],
     "host_permissions": [
         "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "alarm.wav"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ]
 }
