@@ -46,7 +46,7 @@ Anyone: Looking for a simple yet effective productivity tool that encourages min
 
 To install and run FocusFlow in developer mode:
 
-1. Clone the repository:
+1. Clone the repository: https://github.com/nuvashrestha/FocusFlow.git
 
 2. Open Chrome Extensions:
 
